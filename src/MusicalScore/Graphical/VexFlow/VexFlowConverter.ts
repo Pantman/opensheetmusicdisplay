@@ -1086,6 +1086,22 @@ export class VexFlowConverter {
             }
         });
 
+        // TAB duration parsing includes dots in ticks but does not attach glyph modifiers.
+        // A chord gets one rhythmic dot per augmentation, never one per fret.
+        const tab: any = vfnote;
+        const parsedDots: number = tab.getDots();
+        for (let index: number = 0; index < numDots; index++) {
+            tab.addDot();
+            tab.dots = parsedDots;
+            const dot: any = tab.getModifiers()[tab.getModifiers().length - 1];
+            const drawDot: any = dot.draw;
+            dot.draw = function(): any {
+                this.context.openGroup("tab-rhythm-dot");
+                try { return drawDot.call(this); }
+                finally { this.context.closeGroup(); }
+            };
+        }
+        tab.render_options.draw_dots = true;
         return vfnote;
     }
 
