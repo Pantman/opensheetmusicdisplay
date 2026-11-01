@@ -501,6 +501,12 @@ export class VoiceGenerator {
       // create TabNote
       note = new TabNote(this.currentVoiceEntry, this.currentStaffEntry, noteLength, pitch, this.currentMeasure,
                          stringNumber, fretNumber, bends);
+      (note as TabNote).TabSlides = node.elements("notations").flatMap(n => n.elements("slide").map(s => ({
+        type: s.attribute("type")?.value, number: s.attribute("number")?.value || "1",
+        lineType: s.attribute("line-type")?.value || "solid"
+      })));
+      (note as TabNote).TabDoit = node.elements("notations").flatMap(n => n.elements("articulations"))
+        .flatMap(n => n.elements("doit"))[0]?.attribute("line-shape")?.value;
     }
 
     this.addNoteInfo(note, noteTypeXml, printObject, isCueNote, normalNotes,
