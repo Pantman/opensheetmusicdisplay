@@ -75,7 +75,10 @@ export class GraphicalGlissando {
             //endY = glissEndVe.PositionAndShape.RelativePosition.y + glissEndVe.PositionAndShape.BorderTop;
             endY = glissEndNote.PositionAndShape.AbsolutePosition.y;
         } else {
-            if (staffLine.Measures.last().parentSourceMeasure.HasEndLine) {
+            const lastMeasure: any = staffLine.Measures.last();
+            const endSource: any = lastMeasure.parentSourceMeasure ??
+                (lastMeasure.IsExtraGraphicalMeasure ? lastMeasure.ExtraGraphicalMeasurePreviousMeasure?.parentSourceMeasure : undefined);
+            if (endSource?.HasEndLine) {
                 return;
                 // TODO inquire how this can happen: start of glissando at end of last measure. maybe faulty xml? or about slur/slide indices?
             }
