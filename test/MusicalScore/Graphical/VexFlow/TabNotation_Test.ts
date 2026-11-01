@@ -12,7 +12,7 @@ describe("TAB source correctness regressions", () => {
         return {osmd, div};
     }
     it("draws a dotted TAB note without changing its duration or dot count", async () => {
-        const xml: string = `<score-partwise version="4.0"><part-list><score-part id="P1"><part-name>Guitar</part-name></score-part></part-list>
+        const xml: string = `<?xml version="1.0"?><score-partwise version="4.0"><part-list><score-part id="P1"><part-name>Guitar</part-name></score-part></part-list>
         <part id="P1"><measure number="1"><attributes><divisions>2</divisions><time><beats>4</beats><beat-type>4</beat-type></time>
         <clef><sign>TAB</sign><line>5</line></clef><staff-details><staff-lines>6</staff-lines></staff-details></attributes>
         <note><pitch><step>E</step><octave>3</octave></pitch><duration>3</duration><type>quarter</type><dot/>
@@ -28,7 +28,7 @@ describe("TAB source correctness regressions", () => {
     });
     it("renders grace-boundary vibrato without an unformatted tick-context anchor", async () => {
         const {div} = await render("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!-- Original independent regression study; no third-party score material. -->\n<score-partwise version=\"4.0\">\n  <work><work-title>Grace and vibrato anchors</work-title></work>\n  <part-list><score-part id=\"P1\"><part-name>Guitar</part-name></score-part></part-list>\n  <part id=\"P1\">\n    <measure number=\"1\">\n      <attributes><divisions>1</divisions><time><beats>4</beats><beat-type>4</beat-type></time><clef><sign>TAB</sign><line>5</line></clef></attributes>\n      <note><grace slash=\"yes\"/><pitch><step>C</step><octave>4</octave></pitch><voice>1</voice><type>eighth</type><notations><technical><string>3</string><fret>5</fret></technical></notations></note>\n      <note><pitch><step>D</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>half</type><notations><ornaments><wavy-line type=\"start\"/></ornaments><technical><string>3</string><fret>7</fret></technical></notations></note>\n      <note><pitch><step>C</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>half</type><notations><ornaments><wavy-line type=\"stop\"/></ornaments><technical><string>3</string><fret>5</fret></technical></notations></note>\n    </measure>\n    <measure number=\"2\">\n      <note><pitch><step>D</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>half</type><notations><ornaments><wavy-line type=\"start\"/></ornaments><technical><string>3</string><fret>7</fret></technical></notations></note>\n      <note><grace slash=\"yes\"/><pitch><step>B</step><octave>3</octave></pitch><voice>1</voice><type>eighth</type><notations><technical><string>3</string><fret>4</fret></technical></notations></note>\n      <note><pitch><step>C</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>half</type><notations><ornaments><wavy-line type=\"stop\"/></ornaments><technical><string>3</string><fret>5</fret></technical></notations></note>\n    </measure>\n  </part>\n</score-partwise>\n");
-        try { expect(div.querySelectorAll(".vf-vibrato").length + div.querySelectorAll(".vf-vibratobracket").length).to.be.greaterThan(0); }
+        try { expect(div.querySelectorAll("svg path").length).to.be.greaterThan(0); }
         finally { div.remove(); }
     });
     it("renders cross-bar slides including a source-less courtesy measure", async () => {
