@@ -7,7 +7,7 @@ import { SourceMeasure } from "./SourceMeasure";
 
 export class TabNote extends Note {
     constructor(voiceEntry: VoiceEntry, parentStaffEntry: SourceStaffEntry, length: Fraction, pitch: Pitch, sourceMeasure: SourceMeasure,
-                stringNumber: number, fretNumber: number, bendArray: { bendalter: number, direction: string }[]) {
+                stringNumber: number, fretNumber: number, bendArray: { bendalter: number, direction: string, preBend?: boolean }[]) {
         super(voiceEntry, parentStaffEntry, length, pitch, sourceMeasure);
         this.stringNumberTab = stringNumber;
         this.fretNumber = fretNumber;
@@ -16,10 +16,12 @@ export class TabNote extends Note {
 
     public FretVisible: boolean = true;
     public FretParentheses: boolean = false;
+    public TabSlides: {type: string, number: string, lineType: string}[] = [];
+    public TabDoit: string;
 
     private stringNumberTab: number; // there can also be string numbers for e.g. violin in treble clef.
     private fretNumber: number;
-    private bendArray: { bendalter: number, direction: string }[];
+    private bendArray: { bendalter: number, direction: string, preBend?: boolean }[];
 
     /** Returns the string number the note should be played on. Note there can also be violin string numbers in treble clef. */
     public get StringNumberTab(): number {
@@ -30,7 +32,7 @@ export class TabNote extends Note {
         return this.fretNumber;
     }
 
-    public get BendArray(): { bendalter: number, direction: string }[] {
+    public get BendArray(): { bendalter: number, direction: string, preBend?: boolean }[] {
         return this.bendArray;
     }
 

@@ -467,7 +467,7 @@ export class VoiceGenerator {
     let note: Note = undefined;
     let stringNumber: number = -1; //1 to always recognize as valid tab note
     let fretNumber: number = -1; //0 to always recognize as valid tab note
-    const bends: {bendalter: number, direction: string}[] = [];
+    const bends: {bendalter: number, direction: string, preBend?: boolean}[] = [];
     // check for guitar tabs:
     // InstrumentReader already combines repeated notations into the first block.
     const notationNode: IXmlElement = node.element("notations");
@@ -486,9 +486,9 @@ export class VoiceGenerator {
             const bendalterNote: IXmlElement = bend.element("bend-alter");
             const releaseNode: IXmlElement = bend.element("release");
             if (releaseNode !== undefined || parseFloat(bendalterNote.value) < 0) {
-              bends.push({bendalter: parseFloat(bendalterNote.value), direction: "down"});
+              bends.push({bendalter: parseFloat(bendalterNote.value), direction: "down", preBend: bend.element("pre-bend") !== undefined});
             } else {
-              bends.push({bendalter: parseFloat(bendalterNote.value), direction: "up"});
+              bends.push({bendalter: parseFloat(bendalterNote.value), direction: "up", preBend: bend.element("pre-bend") !== undefined});
             }
           });
       }
@@ -503,6 +503,12 @@ export class VoiceGenerator {
                          stringNumber, fretNumber, bends);
       (note as TabNote).FretVisible = notationNode?.attribute("print-object")?.value !== "no";
       (note as TabNote).FretParentheses = node.element("notehead")?.attribute("parentheses")?.value === "yes";
+      (note as TabNote).TabSlides = node.elements("notations").flatMap(n => n.elements("slide").map(s => ({
+        type: s.attribute("type")?.value, number: s.attribute("number")?.value || "1",
+        lineType: s.attribute("line-type")?.value || "solid"
+      })));
+      (note as TabNote).TabDoit = node.elements("notations").flatMap(n => n.elements("articulations"))
+        .flatMap(n => n.elements("doit"))[0]?.attribute("line-shape")?.value;
     }
 
     this.addNoteInfo(note, noteTypeXml, printObject, isCueNote, normalNotes,
