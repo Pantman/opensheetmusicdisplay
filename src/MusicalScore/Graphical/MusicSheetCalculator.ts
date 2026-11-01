@@ -289,6 +289,7 @@ export abstract class MusicSheetCalculator {
         // this.graphicalMusicSheet.initializeActiveClefs(); // could have been changed since last render?
 
         this.createGraphicalTies();
+        this.recoverTabSustainTies();
 
         // calculate SheetLabelBoundingBoxes
         this.calculateSheetLabelBoundingBoxes();
@@ -2683,6 +2684,34 @@ export abstract class MusicSheetCalculator {
             // nothing after calculate() reads pageWidth (the backend sizes from page.Size.width).
             this.graphicalMusicSheet.ParentMusicSheet.pageWidth = layoutPageWidth;
         }
+    }
+
+    /** Recover outgoing sustain ties whose origin is also the endpoint of an H/P. */
+    private recoverTabSustainTies(): void {
+  const notes = new Map<any, any>();
+  const ties = new Set<any>();
+  for (const measure of this.graphicalMusicSheet.MeasureList.flat()) {
+    if (!measure?.ParentStaff.isTab) continue;
+    for (const entry of measure.staffEntries) for (const voice of entry.graphicalVoiceEntries) {
+      for (const graphical of voice.notes) {
+        notes.set(graphical.sourceNote, graphical);
+        if (graphical.sourceNote.NoteTie?.Type === "") ties.add(graphical.sourceNote.NoteTie);
+      }
+    }
+  }
+  const changed = new Set<any>();
+  for (const tie of ties) for (let index = 1; index < tie.Notes.length; index++) {
+    const first = notes.get(tie.Notes[index - 1]), last = notes.get(tie.Notes[index]);
+    if (!first || !last || !first.sourceNote.PrintObject || !last.sourceNote.PrintObject) continue;
+    const entry = first.parentVoiceEntry.parentStaffEntry;
+    if (entry.GraphicalTies.some((existing: GraphicalTie) => existing.Tie.Type === "" && existing.StartNote === first && existing.EndNote === last)) continue;
+    const recovered = new GraphicalTie(tie, first, last) as GraphicalTie & {tabRecoveredSustain: boolean};
+    recovered.tabRecoveredSustain = true;
+    entry.GraphicalTies.push(recovered);
+    if (!entry.ties.includes(tie)) entry.ties.push(tie);
+    changed.add(entry);
+  }
+  for (const entry of changed) this.setTieDirections(entry);
     }
 
     protected createGraphicalTies(): void {
