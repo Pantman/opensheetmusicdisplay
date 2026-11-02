@@ -5,6 +5,12 @@ import { SourceStaffEntry } from "./SourceStaffEntry";
 import { Pitch } from "../../Common/DataObjects/Pitch";
 import { SourceMeasure } from "./SourceMeasure";
 
+export interface TabSlide {
+    type: string;
+    number: string;
+    lineType: string;
+}
+
 export class TabNote extends Note {
     constructor(voiceEntry: VoiceEntry, parentStaffEntry: SourceStaffEntry, length: Fraction, pitch: Pitch, sourceMeasure: SourceMeasure,
                 stringNumber: number, fretNumber: number, bendArray: { bendalter: number, direction: string }[]) {
@@ -14,7 +20,7 @@ export class TabNote extends Note {
         this.bendArray = bendArray;
     }
 
-    public TabSlides: {type: string, number: string, lineType: string}[] = [];
+    public TabSlides: TabSlide[] = [];
     public TabDoit: string;
 
     private stringNumberTab: number; // there can also be string numbers for e.g. violin in treble clef.

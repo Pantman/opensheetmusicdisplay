@@ -145,7 +145,7 @@ export class VexFlowTabMeasure extends VexFlowMeasure {
 
      public draw(ctx: Vex.IRenderContext): void {
         super.draw(ctx);
-        drawTabSymbols.call(this, ctx);
+        drawTabSymbols(this, ctx);
 
         // draw multi-measure rest: unlike a classical measure, this is not a VexFlowMultiRestMeasure class,
         //   so we need to add the multiple measure rest element drawing here.
