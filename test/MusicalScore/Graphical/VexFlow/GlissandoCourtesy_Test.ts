@@ -7,22 +7,26 @@ describe("Glissando source-less courtesy measures", () => {
         it(`handles a courtesy measure with preceding HasEndLine=${hasEndLine}`, () => {
             const source: any = hasEndLine === undefined ? undefined : {HasEndLine: hasEndLine};
             const last: any = {IsExtraGraphicalMeasure: true,
-                ExtraGraphicalMeasurePreviousMeasure: source ? {parentSourceMeasure: source} : undefined};
+                ExtraGraphicalMeasurePreviousMeasure: source ? {parentSourceMeasure: source,
+                    PositionAndShape: {RelativePosition: {x: 0}, Size: {width: 18}}} : undefined};
             const measures: any = [last];
-            measures.last = () => last;
+            measures.last = (): any => last;
             const line: any = {Measures: measures, PositionAndShape: {Size: {width: 20}}};
             const measure: any = {ParentStaffLine: line, PositionAndShape: {RelativePosition: {x: 0}}};
             const entry: any = {parentMeasure: measure, PositionAndShape: {RelativePosition: {x: 1}}};
             const note: any = {PositionAndShape: {RelativePosition: {x: 1}, AbsolutePosition: {y: 4}},
                 parentVoiceEntry: {parentStaffEntry: entry}};
             const start: any = {};
-            entry.findGraphicalNoteFromNote = (n: any) => n === start ? note : undefined;
+            entry.findGraphicalNoteFromNote = (n: any): any => n === start ? note : undefined;
             const glissando: GraphicalGlissando = new GraphicalGlissando({StartNote: start, EndNote: {}, Direction: 0} as any);
             glissando.staffEntries = [entry];
             glissando.StaffLine = line;
             glissando.calculateLine(new EngravingRules());
             expect(Boolean(glissando.Line)).to.equal(!hasEndLine);
             expect(last.parentSourceMeasure).to.equal(undefined);
+            if (hasEndLine === false) {
+                expect(glissando.Line.End.x).to.equal(18);
+            }
         });
     }
 });
