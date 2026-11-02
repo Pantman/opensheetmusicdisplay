@@ -11,6 +11,8 @@ export class GraphicalTie {
     private startNote: GraphicalNote;
     private endNote: GraphicalNote;
     public vfTie: VF.StaveTie;
+    /** Whether this TAB sustain was recovered at a shared hammer-on/pull-off endpoint. */
+    public tabRecoveredSustain: boolean = false;
 
     constructor(tie: Tie, start: GraphicalNote = undefined, end: GraphicalNote = undefined) {
         this.tie = tie;

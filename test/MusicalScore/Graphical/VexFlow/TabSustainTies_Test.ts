@@ -34,6 +34,7 @@ describe("TAB sustain after hammer-on or pull-off", () => {
             const read: () => any[] = (): any[] => osmd.GraphicSheet.findGraphicalMeasure(0, 0).staffEntries.flatMap((entry: any) => entry.GraphicalTies);
             const first: any[] = read();
             expect(first.filter((tie: any) => tie.Tie.Type === "")).to.have.length(1);
+            expect(first.filter((tie: any) => tie.tabRecoveredSustain)).to.have.length(1);
             expect(first.filter((tie: any) => tie.Tie.Type !== "")).to.have.length(1);
             expect(first.every((tie: any) => tie.vfTie !== undefined)).to.equal(true);
             osmd.render();

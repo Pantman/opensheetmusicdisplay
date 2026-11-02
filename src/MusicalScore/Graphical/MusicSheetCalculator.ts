@@ -2718,7 +2718,9 @@ export abstract class MusicSheetCalculator {
                     continue;
                 }
                 const endEntry: GraphicalStaffEntry = last.parentVoiceEntry.parentStaffEntry;
-                entry.GraphicalTies.push(this.createGraphicalTie(tie, entry, endEntry, first, last));
+                const recovered: GraphicalTie = this.createGraphicalTie(tie, entry, endEntry, first, last);
+                recovered.tabRecoveredSustain = true;
+                entry.GraphicalTies.push(recovered);
                 if (!entry.ties.includes(tie)) {
                     entry.ties.push(tie);
                 }
