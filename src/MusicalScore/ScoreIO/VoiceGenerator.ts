@@ -486,9 +486,9 @@ export class VoiceGenerator {
             const bendalterNote: IXmlElement = bend.element("bend-alter");
             const releaseNode: IXmlElement = bend.element("release");
             if (releaseNode !== undefined || parseFloat(bendalterNote.value) < 0) {
-              bends.push({bendalter: parseFloat(bendalterNote.value), direction: "down"});
+              bends.push({bendalter: parseFloat(bendalterNote.value), direction: "down", preBend: bend.element("pre-bend") !== undefined});
             } else {
-              bends.push({bendalter: parseFloat(bendalterNote.value), direction: "up"});
+              bends.push({bendalter: parseFloat(bendalterNote.value), direction: "up", preBend: bend.element("pre-bend") !== undefined});
             }
           });
       }
