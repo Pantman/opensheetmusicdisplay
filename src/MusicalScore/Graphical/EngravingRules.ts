@@ -224,6 +224,8 @@ export class EngravingRules {
     public TabTupletYOffsetTop: number;
     public TabTupletYOffsetEffects: number;
     public TabBeamsRendered: boolean;
+    /** Draw explicit rests on TAB staves. Disable when rhythm is supplied by a paired standard staff. */
+    public TabRestsRendered: boolean;
     public TabKeySignatureRendered: boolean;
     /** Whether space should be reserved as if there was a key signature.
      * False basically only works for tab-only scores, as it prevents vertical x-alignment with other staves.
@@ -814,6 +816,7 @@ export class EngravingRules {
         this.TabTupletYOffsetTop = -3.5; // -3.5 is fine if you don't have effects like bends on top. Otherwise, e.g. -2 avoids overlaps.
         this.TabTupletYOffsetEffects = 1.5;
         this.TabTupletsBracketed = true;
+        this.TabRestsRendered = true;
         this.TabBeamsRendered = true;
         this.TabKeySignatureRendered = false; // standard not to render for tab scores
         this.TabKeySignatureSpacingAdded = true; // false only works for tab-only scores, as it will prevent vertical x-alignment.

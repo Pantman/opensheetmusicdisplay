@@ -17,10 +17,11 @@ describe("Explicit TAB rest glyphs", () => {
     function score(notes: string, divisions: number = 1): string {
         return `<?xml version="1.0"?><score-partwise version="4.0"><part-list><score-part id="P1"><part-name>Guitar</part-name></score-part></part-list>
         <part id="P1"><measure number="1"><attributes><divisions>${divisions}</divisions><time><beats>4</beats><beat-type>4</beat-type></time>
-        <clef><sign>TAB</sign><line>5</line></clef><staff-details><staff-lines>6</staff-lines></staff-details></attributes>${notes}</measure></part></score-partwise>`;
+        <clef><sign>TAB</sign><line>5</line></clef><staff-details><staff-lines>6</staff-lines></staff-details></attributes>
+        ${notes}</measure></part></score-partwise>`;
     }
     it("draws a quarter rest and retains its notated duration", async () => {
-        const osmd: OpenSheetMusicDisplay = await render(score('<note><rest/><duration>1</duration><type>quarter</type></note>'));
+        const osmd: OpenSheetMusicDisplay = await render(score("<note><rest/><duration>1</duration><type>quarter</type></note>"));
         expect(div.querySelectorAll(".vf-tab-rest path").length).to.be.greaterThan(0);
         expect(osmd.GraphicSheet.findGraphicalMeasure(0, 0).staffEntries[0].graphicalVoiceEntries[0].notes[0].sourceNote.Length.RealValue).to.equal(0.25);
     });
@@ -33,4 +34,18 @@ describe("Explicit TAB rest glyphs", () => {
         await render(score('<note print-object="no"><rest/><duration>1</duration><type>quarter</type></note>'));
         expect(div.querySelectorAll(".vf-tab-rest")).to.have.length(0);
     });
+    it("can hide explicit TAB rests when a standard staff supplies the rhythm", async () => {
+        const osmd: OpenSheetMusicDisplay = await render(score("<note><rest/><duration>1</duration><type>quarter</type></note>"));
+        osmd.EngravingRules.TabRestsRendered = false;
+        osmd.render();
+        expect(div.querySelectorAll(".vf-tab-rest")).to.have.length(0);
+    });
+    it("keeps whole-measure rest coordinates stable on reflow", async () => {
+        const osmd: OpenSheetMusicDisplay = await render(score('<note><rest measure="yes"/><duration>4</duration></note>'));
+        const paths: () => string[] = () => Array.from(div.querySelectorAll(".vf-tab-rest path")).map(path => path.getAttribute("d"));
+        const first: string[] = paths();
+        osmd.render();
+        expect(paths()).to.deep.equal(first);
+    });
+
 });
