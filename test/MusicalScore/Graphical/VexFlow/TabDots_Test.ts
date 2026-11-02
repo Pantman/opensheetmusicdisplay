@@ -32,6 +32,8 @@ describe("TAB augmentation dots", () => {
             const vf: any = graphical.vfnote[0];
             expect(vf.getModifiers().filter((m: any) => m.getCategory() === "dots")).to.have.length(dots);
             expect(vf.getDots()).to.equal(dots);
+            expect(div.querySelectorAll(".vf-tab-rhythm-dot")).to.have.length(dots);
+            expect(div.querySelectorAll(".vf-tab-rhythm-dot path")).to.have.length(dots);
             expect(graphical.sourceNote.Length.RealValue).to.equal(duration / 16);
         });
     }

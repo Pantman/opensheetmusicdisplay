@@ -1,3 +1,4 @@
+import { TabRhythmDot } from "./TabRhythmDot";
 import { VexFlowVoiceEntry } from "./VexFlowVoiceEntry";
 import { TabBend, TabBendPhrase, formatTabBendInterval } from "./TabBendLayout";
 import Vex from "vexflow";
@@ -1087,7 +1088,7 @@ export class VexFlowConverter {
         // A chord gets one rhythmic dot per augmentation, never one per fret.
         for (let index: number = 0; index < numDots; index++) {
             // The duration already includes the dots. Attach glyphs directly so addDot() does not count them twice.
-            vfnote.addModifier(new VF.Dot(), 0);
+            vfnote.addModifier(new TabRhythmDot(), 0);
         }
         (vfnote as VF.TabNote & {render_options: {draw_dots: boolean}}).render_options.draw_dots = true;
         return vfnote;
