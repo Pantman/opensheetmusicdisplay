@@ -4,8 +4,9 @@ module.exports = function (config) {
   config.set({
     browsers: ['ChromeHeadless'],
     files: [
-      { pattern: 'test/MusicalScore/Graphical/VexFlow/TabBends_Test.ts', included: true },
-      { pattern: 'test/MusicalScore/Graphical/VexFlow/TabNotation_Test.ts', included: true }
+      { pattern: 'test/MusicalScore/Graphical/VexFlow/Tab*_Test.ts', included: true },
+      { pattern: 'test/MusicalScore/Graphical/VexFlow/VibratoGraceAnchors_Test.ts', included: true },
+      { pattern: 'test/MusicalScore/Graphical/VexFlow/GlissandoCourtesy_Test.ts', included: true }
     ]
   });
 };

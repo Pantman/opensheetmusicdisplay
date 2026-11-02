@@ -1,4 +1,5 @@
-import { configureTabBendLayout } from "./TabBendLayout";
+import { VexFlowVoiceEntry } from "./VexFlowVoiceEntry";
+import { TabBend, TabBendPhrase, formatTabBendInterval } from "./TabBendLayout";
 import Vex from "vexflow";
 import VF = Vex.Flow;
 import {ClefEnum} from "../../VoiceData/Instructions/ClefInstruction";
@@ -1013,7 +1014,7 @@ export class VexFlowConverter {
     public static CreateTabNote(gve: GraphicalVoiceEntry): VF.TabNote {
         const tabPositions: {str: number, fret: number}[] = [];
         const notes: GraphicalNote[] = gve.notes.reverse();
-        const tabPhrases: { type: number, text: string, width: number, draw_width: number }[] = [];
+        const tabPhrases: TabBendPhrase[] = [];
         const frac: Fraction = gve.notes[0].graphicalNoteLength;
         const isTuplet: boolean = gve.notes[0].sourceNote.NoteTuplet !== undefined;
         let duration: string = VexFlowConverter.durations(frac, isTuplet)[0];
@@ -1040,27 +1041,13 @@ export class VexFlowConverter {
             tabPositions.push(tabPosition);
             if (tabNote.BendArray) {
                 tabNote.BendArray.forEach( function( bend: {bendalter: number, direction: string} ): void {
-                    let phraseText: string;
                     // MusicXML bend-alter is a semitone interval, independent of the fret number.
                     if (bend.bendalter === 0) { return; }
-                    const phraseStep: number = Math.abs(bend.bendalter);
-                    const tones: number = phraseStep / 2;
-                    const quarters: number = Math.round(tones * 4);
-                    if (phraseStep === 2) {
-                        phraseText = "Full";
-                    } else if (Number.isInteger(tones)) {
-                        phraseText = String(tones);
-                    } else if (Math.abs(quarters / 4 - tones) < 1e-8) {
-                        const remainder: number = quarters % 4;
-                        phraseText = (quarters >= 4 ? `${Math.floor(quarters / 4)} ` : "") +
-                            (remainder === 2 ? "1/2" : `${remainder}/4`);
-                    } else {
-                        phraseText = String(tones);
-                    }
+                    const phraseText: string = formatTabBendInterval(bend.bendalter);
                     if (bend.direction === "up") {
-                        tabPhrases.push({type: VF.Bend.UP, text: phraseText, width: 10, draw_width: 5});
+                        tabPhrases.push({type: VF.Bend.UP, text: phraseText});
                     } else {
-                        tabPhrases.push({type: VF.Bend.DOWN, text: "", width: 10, draw_width: 5});
+                        tabPhrases.push({type: VF.Bend.DOWN, text: ""});
                     }
                 });
             }
@@ -1094,25 +1081,15 @@ export class VexFlowConverter {
 
         if (tabPhrases.length > 0) {
             // Preserve a single timed gesture, including releases.
-            vfnote.addModifier(new VF.Bend("", false, tabPhrases));
+            vfnote.addModifier(new TabBend(gve as VexFlowVoiceEntry, tabPhrases));
         }
         // TAB duration parsing includes dots in ticks but does not attach glyph modifiers.
         // A chord gets one rhythmic dot per augmentation, never one per fret.
-        const tab: any = vfnote;
-        const parsedDots: number = tab.getDots();
         for (let index: number = 0; index < numDots; index++) {
-            tab.addDot();
-            tab.dots = parsedDots;
-            const dot: any = tab.getModifiers()[tab.getModifiers().length - 1];
-            const drawDot: any = dot.draw;
-            dot.draw = function(): any {
-                this.context.openGroup("tab-rhythm-dot");
-                try { return drawDot.call(this); }
-                finally { this.context.closeGroup(); }
-            };
+            // The duration already includes the dots. Attach glyphs directly so addDot() does not count them twice.
+            vfnote.addModifier(new VF.Dot(), 0);
         }
-        tab.render_options.draw_dots = true;
-        configureTabBendLayout(gve, vfnote);
+        (vfnote as VF.TabNote & {render_options: {draw_dots: boolean}}).render_options.draw_dots = true;
         return vfnote;
     }
 

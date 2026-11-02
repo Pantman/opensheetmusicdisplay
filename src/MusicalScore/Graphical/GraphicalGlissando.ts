@@ -3,6 +3,7 @@ import { Glissando } from "../VoiceData/Glissando";
 import { ColDirEnum } from "./BoundingBox";
 import { EngravingRules } from "./EngravingRules";
 import { GraphicalLine } from "./GraphicalLine";
+import { GraphicalMeasure } from "./GraphicalMeasure";
 import { GraphicalNote } from "./GraphicalNote";
 import { GraphicalStaffEntry } from "./GraphicalStaffEntry";
 import { StaffLine } from "./StaffLine";
@@ -75,14 +76,17 @@ export class GraphicalGlissando {
             //endY = glissEndVe.PositionAndShape.RelativePosition.y + glissEndVe.PositionAndShape.BorderTop;
             endY = glissEndNote.PositionAndShape.AbsolutePosition.y;
         } else {
-            const lastMeasure: any = staffLine.Measures.last();
-            const endSource: any = lastMeasure.parentSourceMeasure ??
-                (lastMeasure.IsExtraGraphicalMeasure ? lastMeasure.ExtraGraphicalMeasurePreviousMeasure?.parentSourceMeasure : undefined);
-            if (endSource?.HasEndLine) {
+            // A courtesy key/time signature has no source and is outside the glissando's musical span.
+            let lastMeasure: GraphicalMeasure = staffLine.Measures.last();
+            if (lastMeasure.IsExtraGraphicalMeasure) {
+                lastMeasure = lastMeasure.ExtraGraphicalMeasurePreviousMeasure;
+            }
+            if (lastMeasure?.parentSourceMeasure?.HasEndLine) {
                 return;
                 // TODO inquire how this can happen: start of glissando at end of last measure. maybe faulty xml? or about slur/slide indices?
             }
-            endX = staffLine.PositionAndShape.Size.width;
+            endX = lastMeasure ? lastMeasure.PositionAndShape.RelativePosition.x + lastMeasure.PositionAndShape.Size.width
+                : staffLine.PositionAndShape.Size.width;
             if (endX - startX > rules.GlissandoStafflineEndOffset) {
                 startX = endX - rules.GlissandoStafflineEndOffset;
             } // else: don't try to set a potentially bigger offset for a note very close to the staffline end

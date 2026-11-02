@@ -12,7 +12,8 @@ describe("TAB source correctness regressions", () => {
         return {osmd, div};
     }
     it("draws a dotted TAB note without changing its duration or dot count", async () => {
-        const xml: string = `<?xml version="1.0"?><score-partwise version="4.0"><part-list><score-part id="P1"><part-name>Guitar</part-name></score-part></part-list>
+        const xml: string = `<?xml version="1.0"?><score-partwise version="4.0"><part-list><score-part id="P1"><part-name>Guitar</part-name>
+        </score-part></part-list>
         <part id="P1"><measure number="1"><attributes><divisions>2</divisions><time><beats>4</beats><beat-type>4</beat-type></time>
         <clef><sign>TAB</sign><line>5</line></clef><staff-details><staff-lines>6</staff-lines></staff-details></attributes>
         <note><pitch><step>E</step><octave>3</octave></pitch><duration>3</duration><type>quarter</type><dot/>
@@ -27,12 +28,181 @@ describe("TAB source correctness regressions", () => {
         } finally { div.remove(); }
     });
     it("renders grace-boundary vibrato without an unformatted tick-context anchor", async () => {
-        const {div} = await render("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!-- Original independent regression study; no third-party score material. -->\n<score-partwise version=\"4.0\">\n  <work><work-title>Grace and vibrato anchors</work-title></work>\n  <part-list><score-part id=\"P1\"><part-name>Guitar</part-name></score-part></part-list>\n  <part id=\"P1\">\n    <measure number=\"1\">\n      <attributes><divisions>1</divisions><time><beats>4</beats><beat-type>4</beat-type></time><clef><sign>TAB</sign><line>5</line></clef></attributes>\n      <note><grace slash=\"yes\"/><pitch><step>C</step><octave>4</octave></pitch><voice>1</voice><type>eighth</type><notations><technical><string>3</string><fret>5</fret></technical></notations></note>\n      <note><pitch><step>D</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>half</type><notations><ornaments><wavy-line type=\"start\"/></ornaments><technical><string>3</string><fret>7</fret></technical></notations></note>\n      <note><pitch><step>C</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>half</type><notations><ornaments><wavy-line type=\"stop\"/></ornaments><technical><string>3</string><fret>5</fret></technical></notations></note>\n    </measure>\n    <measure number=\"2\">\n      <note><pitch><step>D</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>half</type><notations><ornaments><wavy-line type=\"start\"/></ornaments><technical><string>3</string><fret>7</fret></technical></notations></note>\n      <note><grace slash=\"yes\"/><pitch><step>B</step><octave>3</octave></pitch><voice>1</voice><type>eighth</type><notations><technical><string>3</string><fret>4</fret></technical></notations></note>\n      <note><pitch><step>C</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>half</type><notations><ornaments><wavy-line type=\"stop\"/></ornaments><technical><string>3</string><fret>5</fret></technical></notations></note>\n    </measure>\n  </part>\n</score-partwise>\n");
+        const {div} = await render(`<?xml version="1.0" encoding="UTF-8"?>
+<!-- Original independent regression study; no third-party score material. -->
+<score-partwise version="4.0">
+  <work><work-title>Grace and vibrato anchors</work-title></work>
+  <part-list><score-part id="P1"><part-name>Guitar</part-name></score-part></part-list>
+  <part id="P1">
+    <measure number="1">
+      <attributes><divisions>1</divisions><time><beats>4</beats><beat-type>4</beat-type></time><clef><sign>TAB</sign><line>5</line></clef></attributes>
+      <note><grace slash="yes"/><pitch><step>C</step><octave>4</octave></pitch><voice>1</voice><type>eighth</type><notations><technical>
+        <string>3</string><fret>5</fret></technical></notations></note>
+      <note><pitch><step>D</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>half</type><notations><ornaments>
+        <wavy-line type="start"/></ornaments><technical><string>3</string><fret>7</fret></technical></notations></note>
+      <note><pitch><step>C</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>half</type><notations><ornaments>
+        <wavy-line type="stop"/></ornaments><technical><string>3</string><fret>5</fret></technical></notations></note>
+    </measure>
+    <measure number="2">
+      <note><pitch><step>D</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>half</type><notations><ornaments>
+        <wavy-line type="start"/></ornaments><technical><string>3</string><fret>7</fret></technical></notations></note>
+      <note><grace slash="yes"/><pitch><step>B</step><octave>3</octave></pitch><voice>1</voice><type>eighth</type><notations><technical>
+        <string>3</string><fret>4</fret></technical></notations></note>
+      <note><pitch><step>C</step><octave>4</octave></pitch><duration>2</duration><voice>1</voice><type>half</type><notations><ornaments>
+        <wavy-line type="stop"/></ornaments><technical><string>3</string><fret>5</fret></technical></notations></note>
+    </measure>
+  </part>
+</score-partwise>
+`);
         try { expect(div.querySelectorAll("svg path").length).to.be.greaterThan(0); }
         finally { div.remove(); }
     });
     it("renders cross-bar slides including a source-less courtesy measure", async () => {
-        const {div} = await render("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!-- Original independent regression study; no third-party score material. -->\n<score-partwise version=\"4.0\">\n  <work>\n    <work-title>Cross-bar slide study</work-title>\n  </work>\n  <part-list>\n    <score-part id=\"P1\">\n      <part-name>Electric Guitar</part-name>\n      <midi-instrument id=\"I1\">\n        <midi-channel>1</midi-channel>\n        <midi-program>30</midi-program>\n      </midi-instrument>\n    </score-part>\n  </part-list>\n  <part id=\"P1\">\n    <measure number=\"1\">\n      <attributes>\n        <divisions>1</divisions>\n        <time>\n          <beats>1</beats>\n          <beat-type>4</beat-type>\n        </time>\n        <clef>\n          <sign>TAB</sign>\n          <line>5</line>\n        </clef>\n        <staff-details>\n          <staff-lines>6</staff-lines>\n        </staff-details>\n      </attributes>\n      <note>\n        <pitch>\n          <step>G</step>\n          <octave>4</octave>\n        </pitch>\n        <duration>1</duration>\n        <voice>1</voice>\n        <type>quarter</type>\n        <notations>\n          <slide type=\"start\" number=\"3\"/>\n          <technical>\n            <string>3</string>\n            <fret>12</fret>\n          </technical>\n        </notations>\n      </note>\n    </measure>\n    <measure number=\"2\">\n      <note>\n        <pitch>\n          <step>A</step>\n          <octave>4</octave>\n        </pitch>\n        <duration>1</duration>\n        <voice>1</voice>\n        <type>quarter</type>\n        <notations>\n          <slide type=\"stop\" number=\"3\"/>\n          <technical>\n            <string>3</string>\n            <fret>14</fret>\n          </technical>\n        </notations>\n      </note>\n    </measure>\n    <measure number=\"3\">\n      <note>\n        <pitch>\n          <step>A</step>\n          <octave>4</octave>\n        </pitch>\n        <duration>1</duration>\n        <voice>1</voice>\n        <type>quarter</type>\n        <notations>\n          <slide type=\"start\" number=\"3\"/>\n          <slur type=\"start\" number=\"3\"/>\n          <technical>\n            <string>3</string>\n            <fret>14</fret>\n          </technical>\n        </notations>\n      </note>\n    </measure>\n    <measure number=\"4\">\n      <note>\n        <pitch>\n          <step>G</step>\n          <octave>4</octave>\n        </pitch>\n        <duration>1</duration>\n        <voice>1</voice>\n        <type>quarter</type>\n        <notations>\n          <slide type=\"stop\" number=\"3\"/>\n          <slur type=\"stop\" number=\"3\"/>\n          <technical>\n            <string>3</string>\n            <fret>12</fret>\n          </technical>\n        </notations>\n      </note>\n    </measure>\n    <measure number=\"5\">\n      <note>\n        <pitch>\n          <step>C</step>\n          <octave>4</octave>\n        </pitch>\n        <duration>1</duration>\n        <voice>1</voice>\n        <type>quarter</type>\n        <notations>\n          <slide type=\"start\" number=\"3\"/>\n          <slur type=\"start\" number=\"3\"/>\n          <technical>\n            <string>3</string>\n            <fret>5</fret>\n          </technical>\n        </notations>\n      </note>\n    </measure>\n    <measure number=\"6\">\n      <note>\n        <pitch>\n          <step>C</step>\n          <octave>5</octave>\n        </pitch>\n        <duration>1</duration>\n        <voice>1</voice>\n        <type>quarter</type>\n        <notations>\n          <slide type=\"stop\" number=\"3\"/>\n          <slur type=\"stop\" number=\"3\"/>\n          <technical>\n            <string>3</string>\n            <fret>17</fret>\n          </technical>\n        </notations>\n      </note>\n    </measure>\n  </part>\n</score-partwise>\n");
+        const {div} = await render(`<?xml version="1.0" encoding="UTF-8"?>
+<!-- Original independent regression study; no third-party score material. -->
+<score-partwise version="4.0">
+  <work>
+    <work-title>Cross-bar slide study</work-title>
+  </work>
+  <part-list>
+    <score-part id="P1">
+      <part-name>Electric Guitar</part-name>
+      <midi-instrument id="I1">
+        <midi-channel>1</midi-channel>
+        <midi-program>30</midi-program>
+      </midi-instrument>
+    </score-part>
+  </part-list>
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <time>
+          <beats>1</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>TAB</sign>
+          <line>5</line>
+        </clef>
+        <staff-details>
+          <staff-lines>6</staff-lines>
+        </staff-details>
+      </attributes>
+      <note>
+        <pitch>
+          <step>G</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations>
+          <slide type="start" number="3"/>
+          <technical>
+            <string>3</string>
+            <fret>12</fret>
+          </technical>
+        </notations>
+      </note>
+    </measure>
+    <measure number="2">
+      <note>
+        <pitch>
+          <step>A</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations>
+          <slide type="stop" number="3"/>
+          <technical>
+            <string>3</string>
+            <fret>14</fret>
+          </technical>
+        </notations>
+      </note>
+    </measure>
+    <measure number="3">
+      <note>
+        <pitch>
+          <step>A</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations>
+          <slide type="start" number="3"/>
+          <slur type="start" number="3"/>
+          <technical>
+            <string>3</string>
+            <fret>14</fret>
+          </technical>
+        </notations>
+      </note>
+    </measure>
+    <measure number="4">
+      <note>
+        <pitch>
+          <step>G</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations>
+          <slide type="stop" number="3"/>
+          <slur type="stop" number="3"/>
+          <technical>
+            <string>3</string>
+            <fret>12</fret>
+          </technical>
+        </notations>
+      </note>
+    </measure>
+    <measure number="5">
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations>
+          <slide type="start" number="3"/>
+          <slur type="start" number="3"/>
+          <technical>
+            <string>3</string>
+            <fret>5</fret>
+          </technical>
+        </notations>
+      </note>
+    </measure>
+    <measure number="6">
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations>
+          <slide type="stop" number="3"/>
+          <slur type="stop" number="3"/>
+          <technical>
+            <string>3</string>
+            <fret>17</fret>
+          </technical>
+        </notations>
+      </note>
+    </measure>
+  </part>
+</score-partwise>
+`);
         try { expect(div.querySelectorAll("svg").length).to.be.greaterThan(0); }
         finally { div.remove(); }
     });

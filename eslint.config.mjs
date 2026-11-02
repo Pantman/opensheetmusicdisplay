@@ -182,6 +182,11 @@ export default defineConfig(
         },
     },
     {
+        files: ["karma.*.conf.cjs"],
+        languageOptions: {globals: globals.node},
+        rules: {"@typescript-eslint/no-require-imports": "off"},
+    },
+    {
         files: ["test/**/*.ts"],
         languageOptions: {
             globals: {

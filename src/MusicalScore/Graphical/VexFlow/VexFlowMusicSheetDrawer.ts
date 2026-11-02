@@ -1,3 +1,5 @@
+import { TabNote } from "../../VoiceData/TabNote";
+import { setTabSlideDash, tabSlideLineType } from "./TabSymbols";
 import Vex, { IRenderContext } from "vexflow";
 import VF = Vex.Flow;
 import { MusicSheetDrawer } from "../MusicSheetDrawer";
@@ -211,8 +213,18 @@ export class VexFlowMusicSheetDrawer extends MusicSheetDrawer {
             const vfTie: VF.StaveTie = (gGliss as VexFlowGlissando).vfTie;
             if (vfTie) {
                 const context: IRenderContext = this.backend.getContext();
-                vfTie.setContext(context);
-                vfTie.draw();
+                context.save();
+                try {
+                    const start: TabNote = gGliss.Glissando.StartNote as TabNote;
+                    const end: TabNote = gGliss.Glissando.EndNote as TabNote;
+                    if (start instanceof TabNote && end instanceof TabNote) {
+                        setTabSlideDash(context, tabSlideLineType(start, end));
+                    }
+                    vfTie.setContext(context);
+                    vfTie.draw();
+                } finally {
+                    context.restore();
+                }
             }
         }
     }
