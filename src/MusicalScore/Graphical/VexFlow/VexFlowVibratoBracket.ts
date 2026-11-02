@@ -30,7 +30,7 @@ export class VexFlowVibratoBracket extends GraphicalWavyLine {
      * @param graphicalStaffEntry the staff entry that holds the start note
      */
      public setStartNote(graphicalStaffEntry: GraphicalStaffEntry): boolean {
-        for (const gve of graphicalStaffEntry.graphicalVoiceEntries.filter(e => !e.parentVoiceEntry.IsGrace).concat(graphicalStaffEntry.graphicalVoiceEntries.filter(e => e.parentVoiceEntry.IsGrace))) {
+        for (const gve of this.anchorEntries(graphicalStaffEntry)) {
             const vve: VexFlowVoiceEntry = (gve as VexFlowVoiceEntry);
             if (vve?.vfStaveNote) {
                 this.startNote = vve.vfStaveNote;
@@ -47,7 +47,7 @@ export class VexFlowVibratoBracket extends GraphicalWavyLine {
      */
     public setEndNote(graphicalStaffEntry: GraphicalStaffEntry): boolean {
         // this is duplicate code from setStartNote, but if we make one general method, we add a lot of branching.
-        for (const gve of graphicalStaffEntry.graphicalVoiceEntries.filter(e => !e.parentVoiceEntry.IsGrace).concat(graphicalStaffEntry.graphicalVoiceEntries.filter(e => e.parentVoiceEntry.IsGrace))) {
+        for (const gve of this.anchorEntries(graphicalStaffEntry)) {
             const vve: VexFlowVoiceEntry = (gve as VexFlowVoiceEntry);
             if (vve?.vfStaveNote) {
                 this.endNote = vve.vfStaveNote;
@@ -60,6 +60,13 @@ export class VexFlowVibratoBracket extends GraphicalWavyLine {
             }
         }
         return false; // couldn't find an endNote
+    }
+
+    /** Prefer a main note but retain grace-only anchors without changing the staff entry's order. */
+    private anchorEntries(staffEntry: GraphicalStaffEntry): VexFlowVoiceEntry[] {
+        const entries: VexFlowVoiceEntry[] = staffEntry.graphicalVoiceEntries as VexFlowVoiceEntry[];
+        return entries.filter(entry => !entry.parentVoiceEntry?.IsGrace)
+            .concat(entries.filter(entry => entry.parentVoiceEntry?.IsGrace));
     }
 
     public CalculateBoundingBox(): void {
